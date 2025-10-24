@@ -4,43 +4,198 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>設定 - Password Generator</title>
-<style>
-body { margin:0; padding:24px; background:#0f172a; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif; }
-h1 { font-size:18px; margin:0 0 12px; }
-.muted { color:#9ca3af; }
-.card { background:#111827; border:1px solid #374151; border-radius:12px; padding:16px; max-width:720px; }
-.row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0; }
-input[type="number"], input[type="text"] { width:120px; padding:6px; border-radius:8px; border:1px solid #374151; background:#0b1220; color:#e5e7eb; }
-button { padding:10px 14px; border:none; border-radius:10px; background:#1f2937; color:#e5e7eb; cursor:pointer; }
-</style>
+<link rel="stylesheet" href="options.css" />
 </head>
 <body>
+<main class="layout">
+<header class="page-header">
 <h1>⚙ 拡張の設定</h1>
-<p class="muted">※ ポップアップと同じ設定が保存されます（<code>chrome.storage.sync</code>）。</p>
-<div class="card">
+<p class="muted" id="desc-storage">※ ポップアップと同じ設定が保存されます（<code>chrome.storage.sync</code>）。</p>
+</header>
+<section class="card settings">
 <div class="row">
-<span>デフォルト長さ</span>
-<input id="length" type="number" min="6" max="128" />
+<div class="row-info">
+<label for="length">デフォルト長さ</label>
+<p class="description" id="desc-length">生成されるパスワードの標準的な文字数を指定します。</p>
 </div>
-<div class="row"><label><input id="lower" type="checkbox" /> 小文字</label></div>
-<div class="row"><label><input id="upper" type="checkbox" /> 大文字</label></div>
-<div class="row"><label><input id="digits" type="checkbox" /> 数字</label></div>
-<div class="row"><label><input id="symbols" type="checkbox" /> 記号</label></div>
-<div class="row"><label><input id="excludeSimilar" type="checkbox" /> 似た文字を除外</label></div>
-<div class="row"><label><input id="noAmbiguous" type="checkbox" /> 紛らわしい記号を除外</label></div>
-<div class="row"><label><input id="noRepeat" type="checkbox" /> 同一文字の連続を避ける</label></div>
-<hr />
-<div class="row"><label><input id="passphraseMode" type="checkbox" /> パスフレーズモード</label></div>
-<div class="row"><span>単語数</span> <input id="wordCount" type="number" min="3" max="12" /></div>
-<div class="row"><span>区切り</span> <input id="delimiter" type="text" maxlength="2" /></div>
-<div class="row"><label><input id="capitalizeWords" type="checkbox" /> 各単語の先頭を大文字</label></div>
-<div class="row"><label><input id="includeNumberWord" type="checkbox" /> 数字を1つ混ぜる</label></div>
-<div class="row"><label><input id="includeSymbolWord" type="checkbox" /> 記号を1つ混ぜる</label></div>
-<div style="margin-top:12px; display:flex; gap:8px;">
-<button id="saveBtn">保存</button>
-<button id="resetBtn">既定値に戻す</button>
+<div class="row-control">
+<input id="length" type="number" min="6" max="128" inputmode="numeric" />
 </div>
 </div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">小文字</span>
+<p class="description" id="desc-lower">アルファベットの小文字（a〜z）を組み込みます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="lower" type="checkbox" />
+<span>小文字を含める</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">大文字</span>
+<p class="description" id="desc-upper">アルファベットの大文字（A〜Z）を組み込みます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="upper" type="checkbox" />
+<span>大文字を含める</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">数字</span>
+<p class="description" id="desc-digits">0〜9の数字をパスワードに含めます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="digits" type="checkbox" />
+<span>数字を含める</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">記号</span>
+<p class="description" id="desc-symbols">一般的な記号を追加して複雑さを高めます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="symbols" type="checkbox" />
+<span>記号を含める</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">似た文字を除外</span>
+<p class="description" id="desc-excludeSimilar">Iとlなど紛らわしい見た目の文字を使用しません。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="excludeSimilar" type="checkbox" />
+<span>似た文字を除外する</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">紛らわしい記号を除外</span>
+<p class="description" id="desc-noAmbiguous">括弧など用途が限定される記号を除外します。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="noAmbiguous" type="checkbox" />
+<span>紛らわしい記号を除外する</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">同一文字の連続を避ける</span>
+<p class="description" id="desc-noRepeat">同じ文字が続くパターンをできる限り避けます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="noRepeat" type="checkbox" />
+<span>連続を避ける</span>
+</label>
+</div>
+</div>
+
+<hr class="divider" />
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">パスフレーズモード</span>
+<p class="description" id="desc-passphraseMode">複数の単語を組み合わせたパスフレーズを生成します。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="passphraseMode" type="checkbox" />
+<span>パスフレーズを生成する</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<label for="wordCount">単語数</label>
+<p class="description" id="desc-wordCount">パスフレーズに含める単語の数を決めます。</p>
+</div>
+<div class="row-control">
+<input id="wordCount" type="number" min="3" max="12" inputmode="numeric" />
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<label for="delimiter">区切り</label>
+<p class="description" id="desc-delimiter">単語の間に挿入する文字や記号を設定します。</p>
+</div>
+<div class="row-control">
+<input id="delimiter" type="text" maxlength="2" />
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">各単語の先頭を大文字</span>
+<p class="description" id="desc-capitalizeWords">各単語の最初の文字を自動的に大文字にします。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="capitalizeWords" type="checkbox" />
+<span>大文字にする</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">数字を混ぜる</span>
+<p class="description" id="desc-includeNumberWord">パスフレーズの中に数字の単語を1つ差し込みます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="includeNumberWord" type="checkbox" />
+<span>数字を追加する</span>
+</label>
+</div>
+</div>
+
+<div class="row">
+<div class="row-info">
+<span class="row-title">記号を混ぜる</span>
+<p class="description" id="desc-includeSymbolWord">パスフレーズの中に記号の単語を1つ差し込みます。</p>
+</div>
+<div class="row-control">
+<label class="checkbox">
+<input id="includeSymbolWord" type="checkbox" />
+<span>記号を追加する</span>
+</label>
+</div>
+</div>
+
+<div class="actions">
+<button id="saveBtn" type="button">保存</button>
+<button id="resetBtn" type="button">既定値に戻す</button>
+</div>
+<p class="sr-only" id="desc-saveBtn">現在の設定値を保存し、今後のパスワード生成に反映します。</p>
+<p class="sr-only" id="desc-resetBtn">設定を初期値に戻し、保存されている内容をリセットします。</p>
+</section>
+</main>
 <script src="options.js"></script>
 </body>
 </html>
