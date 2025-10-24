@@ -28,27 +28,72 @@
 
 
 <section class="controls">
-<label class="row">
-<span>長さ</span>
-<input id="length" type="number" min="6" max="128" value="16" />
-</label>
-<label class="row"><input id="lower" type="checkbox" checked /> 小文字 (a–z)</label>
-<label class="row"><input id="upper" type="checkbox" checked /> 大文字 (A–Z)</label>
-<label class="row"><input id="digits" type="checkbox" checked /> 数字 (0–9)</label>
-<label class="row"><input id="symbols" type="checkbox" /> 記号 (!@#...)
-</label>
-<label class="row"><input id="excludeSimilar" type="checkbox" /> 似た文字を除外 (0/O, 1/l/I 等)</label>
-<label class="row"><input id="noAmbiguous" type="checkbox" /> 紛らわしい記号を除外 ({ } [ ] ( ) / &#92; &#39; &quot; &#96; ~ , ; : . &lt; &gt;)</label>
-<label class="row"><input id="noRepeat" type="checkbox" /> 同一文字の連続を避ける</label>
-<hr />
-<label class="row"><input id="passphraseMode" type="checkbox" /> パスフレーズモード（英単語を連結）</label>
-<label class="row passphrase"><span>単語数</span><input id="wordCount" type="number" min="3" max="12" value="4" /></label>
-<label class="row passphrase"><span>区切り</span>
-<input id="delimiter" type="text" value="-" maxlength="2" class="delimiter" />
-</label>
-<label class="row passphrase"><input id="capitalizeWords" type="checkbox" /> 各単語の先頭を大文字</label>
-<label class="row passphrase"><input id="includeNumberWord" type="checkbox" /> どこかに数字を1つ混ぜる</label>
-<label class="row passphrase"><input id="includeSymbolWord" type="checkbox" /> どこかに記号を1つ混ぜる</label>
+  <div class="control-section">
+    <h2 class="section-title">文字セット</h2>
+    <div class="option-list">
+      <div class="option-item">
+        <label class="row">
+          <span>長さ</span>
+          <input id="length" type="number" min="6" max="128" value="16" />
+        </label>
+      </div>
+      <div class="option-item">
+        <label class="row"><input id="lower" type="checkbox" checked /> 小文字 (a–z)</label>
+      </div>
+      <div class="option-item">
+        <label class="row"><input id="upper" type="checkbox" checked /> 大文字 (A–Z)</label>
+      </div>
+      <div class="option-item">
+        <label class="row"><input id="digits" type="checkbox" checked /> 数字 (0–9)</label>
+      </div>
+      <div class="option-item">
+        <label class="row"><input id="symbols" type="checkbox" /> 記号 (!@#...)</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-section">
+    <h2 class="section-title">除外オプション</h2>
+    <div class="option-list">
+      <div class="option-item">
+        <label class="row"><input id="excludeSimilar" type="checkbox" /> 似た文字を除外 (0/O, 1/l/I 等)</label>
+        <p class="option-note">よく似た文字を省き、読み間違いによるトラブルを減らします。</p>
+      </div>
+      <div class="option-item">
+        <label class="row"><input id="noAmbiguous" type="checkbox" /> 紛らわしい記号を除外 ({ } [ ] ( ) / &#92; &#39; &quot; &#96; ~ , ; : . &lt; &gt;)</label>
+        <p class="option-note">入力しづらい記号を外して、コピーミスや手入力の負担を軽くします。</p>
+      </div>
+      <div class="option-item">
+        <label class="row"><input id="noRepeat" type="checkbox" /> 同一文字の連続を避ける</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-section">
+    <h2 class="section-title">パスフレーズ</h2>
+    <div class="option-list">
+      <div class="option-item">
+        <label class="row"><input id="passphraseMode" type="checkbox" /> パスフレーズモード（英単語を連結）</label>
+      </div>
+      <div class="option-item passphrase">
+        <label class="row"><span>単語数</span><input id="wordCount" type="number" min="3" max="12" value="4" /></label>
+      </div>
+      <div class="option-item passphrase">
+        <label class="row"><span>区切り</span>
+          <input id="delimiter" type="text" value="-" maxlength="2" class="delimiter" />
+        </label>
+      </div>
+      <div class="option-item passphrase">
+        <label class="row"><input id="capitalizeWords" type="checkbox" /> 各単語の先頭を大文字</label>
+      </div>
+      <div class="option-item passphrase">
+        <label class="row"><input id="includeNumberWord" type="checkbox" /> どこかに数字を1つ混ぜる</label>
+      </div>
+      <div class="option-item passphrase">
+        <label class="row"><input id="includeSymbolWord" type="checkbox" /> どこかに記号を1つ混ぜる</label>
+      </div>
+    </div>
+  </div>
 </section>
 
 
