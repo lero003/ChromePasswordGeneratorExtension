@@ -6,9 +6,9 @@ if (!generatorModule) {
 const {
   generatePassword: coreGeneratePassword,
   generatePassphrase: coreGeneratePassphrase,
-  filterCharacters,
-  CHAR_SETS,
-  WORD_LIST,
+  filterCharacters: coreFilterCharacters,
+  CHAR_SETS: coreCharSets,
+  WORD_LIST: coreWordList,
 } = generatorModule;
 
 const els = (() => {
@@ -67,10 +67,10 @@ function readOptionsFromUI() {
 
 function buildActiveGroups(opts) {
   const groups = [];
-  if (opts.lower) groups.push(filterCharacters(CHAR_SETS.lower, opts));
-  if (opts.upper) groups.push(filterCharacters(CHAR_SETS.upper, opts));
-  if (opts.digits) groups.push(filterCharacters(CHAR_SETS.digits, opts));
-  if (opts.symbols) groups.push(filterCharacters(CHAR_SETS.symbols, opts));
+  if (opts.lower) groups.push(coreFilterCharacters(coreCharSets.lower, opts));
+  if (opts.upper) groups.push(coreFilterCharacters(coreCharSets.upper, opts));
+  if (opts.digits) groups.push(coreFilterCharacters(coreCharSets.digits, opts));
+  if (opts.symbols) groups.push(coreFilterCharacters(coreCharSets.symbols, opts));
   return groups.filter(group => typeof group === 'string' && group.length > 0);
 }
 
@@ -78,15 +78,15 @@ function buildActiveGroups(opts) {
 function estimateEntropy(text, opts) {
   if (!text) return 0;
   if (opts.passphraseMode) {
-    let entropy = opts.wordCount * Math.log2(WORD_LIST.length);
+    let entropy = opts.wordCount * Math.log2(coreWordList.length);
     if (opts.includeNumberWord) {
-      const digits = filterCharacters(CHAR_SETS.digits, opts);
+      const digits = coreFilterCharacters(coreCharSets.digits, opts);
       if (digits.length) {
         entropy += Math.log2(digits.length);
       }
     }
     if (opts.includeSymbolWord) {
-      const symbols = filterCharacters(CHAR_SETS.symbols, opts);
+      const symbols = coreFilterCharacters(coreCharSets.symbols, opts);
       if (symbols.length) {
         entropy += Math.log2(symbols.length);
       }
