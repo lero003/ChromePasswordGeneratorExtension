@@ -1,15 +1,15 @@
-const WORD_LIST = [
-  'apple','anchor','autumn','breeze','bridge','candle','canvas','cherry','cloud','cobalt',
-  'daisy','delta','ember','feather','forest','galaxy','garden','harbor','honey','island',
-  'ivory','jungle','lantern','lemon','meadow','meteor','mist','moon','mountain','nebula',
-  'oasis','ocean','opal','orchid','panda','pearl','piano','poppy','prairie','quartz',
-  'quill','raven','river','saffron','shadow','sprout','star','stone','sunset','thunder',
-  'tiger','valley','velvet','violet','walnut','willow','winter','zenith','zephyr','zinnia'
-];
+const generatorModule = window.pwGenerator;
+if (!generatorModule) {
+  throw new Error('Password generator module failed to load.');
+}
 
-const SYMBOLS_BASE = "!\"#$%&'()*+,-./:;<=>?@[\\]^_{|}~";
-const AMBIGUOUS_SYMBOLS = new Set("{}[]()/\\'\"`~,;:.<>");
-const SIMILAR_CHARS = new Set(['0', 'O', 'o', '1', 'l', 'I', 'S', '5', '2', 'Z']);
+const {
+  generatePassword: coreGeneratePassword,
+  generatePassphrase: coreGeneratePassphrase,
+  filterCharacters,
+  CHAR_SETS,
+  WORD_LIST,
+} = generatorModule;
 
 const els = (() => {
   const ids = [
@@ -28,39 +28,6 @@ const els = (() => {
   map.passphraseRows = Array.from(document.querySelectorAll('.passphrase'));
   return map;
 })();
-
-
-function cryptoRandomInt(max) {
-  if (!Number.isFinite(max) || max <= 0) {
-    throw new Error('乱数の上限が不正です');
-  }
-  const rangeLimit = Math.floor((0x100000000 / max)) * max;
-  const buf = new Uint32Array(1);
-  let value;
-  do {
-    crypto.getRandomValues(buf);
-    value = buf[0];
-  } while (value >= rangeLimit);
-  return value % max;
-}
-
-
-function pickRandom(arrayLike) {
-  if (!arrayLike.length) {
-    throw new Error('候補が存在しません');
-  }
-  const index = cryptoRandomInt(arrayLike.length);
-  return arrayLike[index];
-}
-
-
-function shuffleInPlace(arr) {
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = cryptoRandomInt(i + 1);
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
 
 function readOptionsFromUI() {
@@ -98,111 +65,13 @@ function readOptionsFromUI() {
 }
 
 
-function buildCharSet(opts) {
-  let lower = 'abcdefghijklmnopqrstuvwxyz';
-  let upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let digits = '0123456789';
-  let symbols = SYMBOLS_BASE;
-
-  if (opts.excludeSimilar) {
-    const filterSimilar = str => str.split('').filter(ch => !SIMILAR_CHARS.has(ch)).join('');
-    lower = filterSimilar(lower);
-    upper = filterSimilar(upper);
-    digits = filterSimilar(digits);
-  }
-
-  if (opts.noAmbiguous) {
-    symbols = symbols.split('').filter(ch => !AMBIGUOUS_SYMBOLS.has(ch)).join('');
-  }
-
+function buildActiveGroups(opts) {
   const groups = [];
-  if (opts.lower && lower.length) groups.push(lower);
-  if (opts.upper && upper.length) groups.push(upper);
-  if (opts.digits && digits.length) groups.push(digits);
-  if (opts.symbols && symbols.length) groups.push(symbols);
-
-  if (!groups.length) {
-    throw new Error('少なくとも1種類の文字を選択してください');
-  }
-
-  return groups;
-}
-
-
-function generatePassword(opts) {
-  const groups = buildCharSet(opts);
-  const pool = groups.join('');
-  if (opts.length < groups.length) {
-    throw new Error('長さが不足しています。より長い値を指定してください');
-  }
-
-  const resultChars = [];
-  groups.forEach(group => {
-    resultChars.push(pickRandom(group));
-  });
-
-  while (resultChars.length < opts.length) {
-    let ch;
-    do {
-      ch = pickRandom(pool);
-    } while (opts.noRepeat && resultChars.length && ch === resultChars[resultChars.length - 1] && pool.length > 1);
-    resultChars.push(ch);
-  }
-
-  shuffleInPlace(resultChars);
-
-  if (opts.noRepeat) {
-    for (let i = 1; i < resultChars.length; i += 1) {
-      if (resultChars[i] === resultChars[i - 1]) {
-        for (let attempt = 0; attempt < 5; attempt += 1) {
-          const replacement = pickRandom(pool);
-          if (replacement !== resultChars[i - 1]) {
-            resultChars[i] = replacement;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  return resultChars.join('');
-}
-
-
-function applyCapitalization(word) {
-  if (!word) return word;
-  return word[0].toUpperCase() + word.slice(1);
-}
-
-
-function generatePassphrase(opts) {
-  if (!WORD_LIST.length) {
-    throw new Error('単語リストが空です');
-  }
-
-  const tokens = [];
-  for (let i = 0; i < opts.wordCount; i += 1) {
-    let word = pickRandom(WORD_LIST);
-    if (opts.capitalizeWords) {
-      word = applyCapitalization(word);
-    }
-    tokens.push(word);
-  }
-
-  if (opts.includeNumberWord) {
-    tokens.push(String(cryptoRandomInt(10)));
-  }
-
-  if (opts.includeSymbolWord) {
-    const availableSymbols = opts.noAmbiguous
-      ? SYMBOLS_BASE.split('').filter(ch => !AMBIGUOUS_SYMBOLS.has(ch))
-      : SYMBOLS_BASE.split('');
-    tokens.push(pickRandom(availableSymbols));
-  }
-
-  shuffleInPlace(tokens);
-
-  return tokens.join(opts.delimiter);
+  if (opts.lower) groups.push(filterCharacters(CHAR_SETS.lower, opts));
+  if (opts.upper) groups.push(filterCharacters(CHAR_SETS.upper, opts));
+  if (opts.digits) groups.push(filterCharacters(CHAR_SETS.digits, opts));
+  if (opts.symbols) groups.push(filterCharacters(CHAR_SETS.symbols, opts));
+  return groups.filter(group => typeof group === 'string' && group.length > 0);
 }
 
 
@@ -210,18 +79,25 @@ function estimateEntropy(text, opts) {
   if (!text) return 0;
   if (opts.passphraseMode) {
     let entropy = opts.wordCount * Math.log2(WORD_LIST.length);
-    if (opts.includeNumberWord) entropy += Math.log2(10);
+    if (opts.includeNumberWord) {
+      const digits = filterCharacters(CHAR_SETS.digits, opts);
+      if (digits.length) {
+        entropy += Math.log2(digits.length);
+      }
+    }
     if (opts.includeSymbolWord) {
-      const symbolPool = opts.noAmbiguous
-        ? SYMBOLS_BASE.split('').filter(ch => !AMBIGUOUS_SYMBOLS.has(ch))
-        : SYMBOLS_BASE.split('');
-      entropy += Math.log2(symbolPool.length);
+      const symbols = filterCharacters(CHAR_SETS.symbols, opts);
+      if (symbols.length) {
+        entropy += Math.log2(symbols.length);
+      }
     }
     return entropy;
   }
 
-  const groups = buildCharSet(opts);
+  const groups = buildActiveGroups(opts);
+  if (!groups.length) return 0;
   const uniqueChars = new Set(groups.join('').split(''));
+  if (!uniqueChars.size) return 0;
   return text.length * Math.log2(uniqueChars.size);
 }
 
@@ -300,11 +176,18 @@ function generateAndShow() {
 
   let text = '';
   try {
-    if (opts.passphraseMode) {
-      text = generatePassphrase(opts);
-    } else {
-      text = generatePassword(opts);
+    if (!opts.passphraseMode) {
+      const groups = buildActiveGroups(opts);
+      if (!groups.length) {
+        throw new Error('少なくとも1種類の文字を選択してください');
+      }
+      if (opts.length < groups.length) {
+        throw new Error('長さが不足しています。より長い値を指定してください');
+      }
     }
+    text = opts.passphraseMode
+      ? coreGeneratePassphrase(opts)
+      : coreGeneratePassword(opts);
     els.output.value = text;
     updateStrengthView(text, opts);
     saveSettings(opts);

@@ -208,6 +208,7 @@ function generatePassphrase(inputOptions = {}) {
 const exported = {
   generatePassword,
   generatePassphrase,
+  filterCharacters,
   CHAR_SETS,
   SIMILAR_CHARACTERS,
   AMBIGUOUS_SYMBOLS,
@@ -221,4 +222,5 @@ if (typeof module !== 'undefined' && module.exports) {
 if (typeof window !== 'undefined') {
   window.generatePassword = generatePassword;
   window.generatePassphrase = generatePassphrase;
+  window.pwGenerator = exported;
 }
