@@ -113,14 +113,37 @@ function buildActiveCategories(options) {
   return categories;
 }
 
-function ensureCategoryCoverage(result, categories, options) {
+function ensureCategoryCoverage(result, categories, options, rng = randomIndex) {
+  if (result.length < categories.length) {
+    throw new Error('Password length must be at least the number of enabled character sets.');
+  }
+
+  const counts = new Map(categories.map((category) => [category.key, 0]));
+  const indexCategories = result.map((char) => {
+    const matched = categories.find((category) => category.chars.includes(char));
+    if (matched) {
+      counts.set(matched.key, (counts.get(matched.key) || 0) + 1);
+      return matched.key;
+    }
+    return null;
+  });
+
   for (const category of categories) {
-    const hasCategoryChar = result.some((ch) => category.chars.includes(ch));
-    if (hasCategoryChar) continue;
+    if ((counts.get(category.key) || 0) > 0) {
+      continue;
+    }
+
     let placed = false;
-    for (let attempt = 0; attempt < 200 && !placed; attempt += 1) {
-      const replacementIndex = randomIndex(result.length);
-      const candidate = category.chars[randomIndex(category.chars.length)];
+    for (let attempt = 0; attempt < 400 && !placed; attempt += 1) {
+      const replacementIndex = rng(result.length);
+      const currentKey = indexCategories[replacementIndex];
+      if (currentKey && (counts.get(currentKey) || 0) <= 1) {
+        continue;
+      }
+
+      const candidateIndex = rng(category.chars.length);
+      const candidate = category.chars[candidateIndex];
+
       if (options.noRepeat) {
         const prev = replacementIndex > 0 ? result[replacementIndex - 1] : null;
         const next = replacementIndex < result.length - 1 ? result[replacementIndex + 1] : null;
@@ -128,9 +151,16 @@ function ensureCategoryCoverage(result, categories, options) {
           continue;
         }
       }
+
+      if (currentKey) {
+        counts.set(currentKey, (counts.get(currentKey) || 0) - 1);
+      }
       result[replacementIndex] = candidate;
+      indexCategories[replacementIndex] = category.key;
+      counts.set(category.key, (counts.get(category.key) || 0) + 1);
       placed = true;
     }
+
     if (!placed) {
       throw new Error('Failed to satisfy required character categories.');
     }
@@ -139,19 +169,36 @@ function ensureCategoryCoverage(result, categories, options) {
 
 function generatePassword(inputOptions = {}) {
   const options = { ...DEFAULT_PASSWORD_OPTIONS, ...inputOptions };
-  options.length = normalizeLength(options.length, 6, 128, DEFAULT_PASSWORD_OPTIONS.length);
+  const randomIndexOverride = options.randomIndex;
+  if (randomIndexOverride) {
+    delete options.randomIndex;
+  }
+  options.length = normalizeLength(options.length, 1, 128, DEFAULT_PASSWORD_OPTIONS.length);
   const categories = buildActiveCategories(options);
   if (categories.length === 0) {
     throw new Error('At least one character set must be enabled.');
+  }
+  if (options.length < categories.length) {
+    throw new Error('Password length must be at least the number of enabled character sets.');
   }
   const pool = categories.map((category) => category.chars).join('');
   if (!pool) {
     throw new Error('No characters available for generation.');
   }
 
+  const rng = typeof randomIndexOverride === 'function'
+    ? (max) => {
+      const value = randomIndexOverride(max);
+      if (!Number.isInteger(value) || value < 0 || value >= max) {
+        throw new Error('randomIndex override must return an integer within range.');
+      }
+      return value;
+    }
+    : randomIndex;
+
   const passwordChars = [];
   while (passwordChars.length < options.length) {
-    const candidate = pool[randomIndex(pool.length)];
+    const candidate = pool[rng(pool.length)];
     if (options.noRepeat && passwordChars.length > 0) {
       const previous = passwordChars[passwordChars.length - 1];
       if (candidate === previous) {
@@ -161,7 +208,7 @@ function generatePassword(inputOptions = {}) {
     passwordChars.push(candidate);
   }
 
-  ensureCategoryCoverage(passwordChars, categories, options);
+  ensureCategoryCoverage(passwordChars, categories, options, rng);
   return passwordChars.join('');
 }
 

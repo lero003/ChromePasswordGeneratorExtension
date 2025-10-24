@@ -13,6 +13,17 @@ function hasCharFromSet(text, characters) {
   return [...text].some((char) => characters.includes(char));
 }
 
+function createSequenceRandomIndex(sequence, fallback = 0) {
+  let index = 0;
+  return (max) => {
+    const value = index < sequence.length ? sequence[index] : fallback;
+    if (index < sequence.length) {
+      index += 1;
+    }
+    return value % max;
+  };
+}
+
 describe('generatePassword', () => {
   it('creates a password with the requested length and characters', () => {
     const options = { length: 24, lower: true, upper: true, digits: true, symbols: true };
@@ -74,8 +85,34 @@ describe('generatePassword', () => {
     expect(hasCharFromSet(result, CHAR_SETS.symbols)).toBe(true);
   });
 
+  it('ensures coverage for short lengths without overwriting categories', () => {
+    const deterministicRandom = createSequenceRandomIndex([0, 0, 0, 0, 0, 0, 1, 0]);
+    const result = generatePassword({
+      length: 3,
+      lower: true,
+      upper: true,
+      digits: true,
+      symbols: false,
+      randomIndex: deterministicRandom,
+    });
+    expect(result).toHaveLength(3);
+    expect(hasCharFromSet(result, CHAR_SETS.lower)).toBe(true);
+    expect(hasCharFromSet(result, CHAR_SETS.upper)).toBe(true);
+    expect(hasCharFromSet(result, CHAR_SETS.digits)).toBe(true);
+  });
+
   it('throws when no character sets are enabled', () => {
     expect(() => generatePassword({ length: 16, lower: false, upper: false, digits: false, symbols: false })).toThrow();
+  });
+
+  it('throws when the requested length is shorter than the number of enabled categories', () => {
+    expect(() => generatePassword({
+      length: 2,
+      lower: true,
+      upper: true,
+      digits: true,
+      symbols: true,
+    })).toThrow('Password length must be at least the number of enabled character sets.');
   });
 });
 
