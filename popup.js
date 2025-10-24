@@ -102,34 +102,47 @@ function estimateEntropy(text, opts) {
 }
 
 
+const BAR_STATES = ['bar--weak', 'bar--fair', 'bar--good', 'bar--strong'];
+
+function setBarState(state) {
+  BAR_STATES.forEach(cls => {
+    els.strengthBar.classList.toggle(cls, cls === state);
+  });
+  if (!state) {
+    els.strengthBar.classList.remove(...BAR_STATES);
+  }
+}
+
 function updateStrengthView(text, opts) {
   const entropy = Number.isFinite(opts.entropyOverride) ? opts.entropyOverride : estimateEntropy(text, opts);
   if (!text) {
     els.strengthBar.style.width = '0%';
-    els.strengthBar.style.background = 'var(--danger)';
+    els.strengthBar.style.removeProperty('background');
+    setBarState('bar--weak');
     els.strengthLabel.textContent = '強度: - / 推定エントロピー: - bit';
     return;
   }
   let label = '-';
-  let color = 'var(--danger)';
+  let state = 'bar--weak';
   const thresholds = [
-    { limit: 28, label: '弱い', color: 'var(--danger)' },
-    { limit: 45, label: '普通', color: '#f59e0b' },
-    { limit: 60, label: '強い', color: '#10b981' },
-    { limit: Infinity, label: '非常に強い', color: 'var(--accent)' },
+    { limit: 28, label: '弱い', state: 'bar--weak' },
+    { limit: 45, label: '普通', state: 'bar--fair' },
+    { limit: 60, label: '強い', state: 'bar--good' },
+    { limit: Infinity, label: '非常に強い', state: 'bar--strong' },
   ];
 
   for (const item of thresholds) {
     if (entropy <= item.limit) {
       label = item.label;
-      color = item.color;
+      state = item.state;
       break;
     }
   }
 
   const progress = Math.max(0, Math.min(100, Math.round((entropy / 80) * 100)));
   els.strengthBar.style.width = `${progress}%`;
-  els.strengthBar.style.background = color;
+  els.strengthBar.style.removeProperty('background');
+  setBarState(state);
   els.strengthLabel.textContent = `強度: ${label} / 推定エントロピー: ${entropy ? entropy.toFixed(1) : '-'} bit`;
 }
 
