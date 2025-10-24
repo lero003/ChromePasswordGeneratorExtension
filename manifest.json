@@ -1,0 +1,15 @@
+{
+"manifest_version": 3,
+"name": "Password Generator by Chika",
+"description": "手軽に強力パスワードやパスフレーズを生成してコピー。設定は保存されます。",
+"version": "1.0.0",
+"action": {
+"default_title": "Password Generator",
+"default_popup": "popup.html"
+},
+"options_page": "options.html",
+"permissions": [
+"storage",
+"clipboardWrite"
+]
+}

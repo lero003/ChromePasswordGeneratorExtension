@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>設定 - Password Generator</title>
+<style>
+body { margin:0; padding:24px; background:#0f172a; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif; }
+h1 { font-size:18px; margin:0 0 12px; }
+.muted { color:#9ca3af; }
+.card { background:#111827; border:1px solid #374151; border-radius:12px; padding:16px; max-width:720px; }
+.row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0; }
+input[type="number"], input[type="text"] { width:120px; padding:6px; border-radius:8px; border:1px solid #374151; background:#0b1220; color:#e5e7eb; }
+button { padding:10px 14px; border:none; border-radius:10px; background:#1f2937; color:#e5e7eb; cursor:pointer; }
+</style>
+</head>
+<body>
+<h1>⚙ 拡張の設定</h1>
+<p class="muted">※ ポップアップと同じ設定が保存されます（<code>chrome.storage.sync</code>）。</p>
+<div class="card">
+<div class="row">
+<span>デフォルト長さ</span>
+<input id="length" type="number" min="6" max="128" />
+</div>
+<div class="row"><label><input id="lower" type="checkbox" /> 小文字</label></div>
+<div class="row"><label><input id="upper" type="checkbox" /> 大文字</label></div>
+<div class="row"><label><input id="digits" type="checkbox" /> 数字</label></div>
+<div class="row"><label><input id="symbols" type="checkbox" /> 記号</label></div>
+<div class="row"><label><input id="excludeSimilar" type="checkbox" /> 似た文字を除外</label></div>
+<div class="row"><label><input id="noAmbiguous" type="checkbox" /> 紛らわしい記号を除外</label></div>
+<div class="row"><label><input id="noRepeat" type="checkbox" /> 同一文字の連続を避ける</label></div>
+<hr />
+<div class="row"><label><input id="passphraseMode" type="checkbox" /> パスフレーズモード</label></div>
+<div class="row"><span>単語数</span> <input id="wordCount" type="number" min="3" max="12" /></div>
+<div class="row"><span>区切り</span> <input id="delimiter" type="text" maxlength="2" /></div>
+<div class="row"><label><input id="capitalizeWords" type="checkbox" /> 各単語の先頭を大文字</label></div>
+<div class="row"><label><input id="includeNumberWord" type="checkbox" /> 数字を1つ混ぜる</label></div>
+<div class="row"><label><input id="includeSymbolWord" type="checkbox" /> 記号を1つ混ぜる</label></div>
+<div style="margin-top:12px; display:flex; gap:8px;">
+<button id="saveBtn">保存</button>
+<button id="resetBtn">既定値に戻す</button>
+</div>
+</div>
+<script src="options.js"></script>
+</body>
+</html>
