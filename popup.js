@@ -1,4 +1,4 @@
-// 小さめの内蔵英単語リスト（必要に応じて拡張可）
+// ポップアップ UI のイベントと設定保存をまとめたメインスクリプト
 async function saveSettings(opts) {
 try { await chrome.storage.sync.set({ pwgen_settings: opts }); } catch {}
 }
