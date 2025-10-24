@@ -54,4 +54,34 @@ window.addEventListener('DOMContentLoaded', () => {
 load();
 $('saveBtn').addEventListener('click', save);
 $('resetBtn').addEventListener('click', reset);
+attachDescriptions();
 });
+
+
+function attachDescriptions() {
+const descriptions = {
+length: 'desc-length',
+lower: 'desc-lower',
+upper: 'desc-upper',
+digits: 'desc-digits',
+symbols: 'desc-symbols',
+excludeSimilar: 'desc-excludeSimilar',
+noAmbiguous: 'desc-noAmbiguous',
+noRepeat: 'desc-noRepeat',
+passphraseMode: 'desc-passphraseMode',
+wordCount: 'desc-wordCount',
+delimiter: 'desc-delimiter',
+capitalizeWords: 'desc-capitalizeWords',
+includeNumberWord: 'desc-includeNumberWord',
+includeSymbolWord: 'desc-includeSymbolWord',
+saveBtn: 'desc-saveBtn',
+resetBtn: 'desc-resetBtn',
+};
+
+Object.entries(descriptions).forEach(([id, descId]) => {
+const el = $(id);
+const desc = document.getElementById(descId);
+if (!el || !desc) return;
+el.setAttribute('aria-describedby', descId);
+});
+}
